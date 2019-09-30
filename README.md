@@ -14,6 +14,6 @@ You should then be able to run each of the examples from the presentation
 (numbered as indicated in the slides).
 
 If you're looking for the table definitions themselves or how the database
-connection is set up, see `code/pygotham_2019/model.py for the model
+connection is set up, see `code/pygotham_2019/model.py` for the model
 definitions and `code/pygotham_2019/meta.py` for the engine/session/metadata
 definitions.
