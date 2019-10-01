@@ -1,4 +1,4 @@
-from sqlalchemy.sql.expression import func, literal
+from sqlalchemy.sql.expression import and_, func, literal
 
 from pygotham_2019 import meta, model, sales
 from pygotham_2019.utils import print_table
@@ -7,6 +7,32 @@ from pygotham_2019.utils import print_table
 if __name__ == "__main__":
 
     sales.setup()
+
+    latest_sales_sq = (
+        meta.session.query(
+            model.Sale.id,
+            func.row_number().over(
+                partition_by=model.Sale.store_id,
+                order_by=model.Sale.date.desc(),
+            ).label("row_number"),
+        )
+    ).subquery("latest_sales")
+
+    latest_sales = (
+        meta.session.query(model.Sale)
+        .join(
+            latest_sales_sq,
+            and_(
+                model.Sale.id == latest_sales_sq.c.id,
+                latest_sales_sq.c.row_number == 1,
+            )
+        )
+        .order_by(model.Sale.id)
+    )
+
+    print("window functions to find the latest sale at each store")
+    print_table(latest_sales)
+    print("")
 
     sales_by_store = (
         meta.session.query(
